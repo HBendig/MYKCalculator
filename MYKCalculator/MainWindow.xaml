@@ -1,0 +1,21 @@
+﻿<Window x:Class="MYKCalculator.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MYKCalculator"
+        mc:Ignorable="d"
+        Title="MYK Score" Height="450" Width="800">
+    <Grid>
+        
+        <Button x:Name="btn_xlsPickerButton" Content="Choose Excel-Spreadsheet" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="168" Height="36" Click="btn_xlsPickerButton_Click"/>
+        <TextBlock x:Name="lbl_Filepath" HorizontalAlignment="Left" Margin="208,20,0,0" TextWrapping="Wrap" Text="&lt;Choose a file ...&gt;" VerticalAlignment="Top" Height="18" Width="574"/>
+        <Button x:Name="btn_ImportData" Content="Import Data" HorizontalAlignment="Left" Margin="10,51,0,0" VerticalAlignment="Top" Width="168" Height="36" Click="btn_ImportData_Click" IsEnabled="False"/>
+        <ComboBox x:Name="cmbbox_TableChooser" VerticalContentAlignment="Center" HorizontalAlignment="Left" Margin="208,51,0,0" VerticalAlignment="Top" Width="271" Height="36" IsEnabled="False"/>
+        <Button x:Name="btn_CalculateScore" Content="Calculate Score" HorizontalAlignment="Left" Margin="10,92,0,0" VerticalAlignment="Top" Width="168" Height="36" IsEnabled="False" Click="btn_CalculateScore_Click"/>
+
+
+        <DataGrid x:Name="dgrid_DataGrid" ClipboardCopyMode="IncludeHeader" ItemsSource="{Binding}" ScrollViewer.CanContentScroll="True"  MinHeight="280" Margin="10,140,10,10" MinWidth="764"/>
+
+    </Grid>
+</Window>
