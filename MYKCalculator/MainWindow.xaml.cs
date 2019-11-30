@@ -6,7 +6,7 @@ using System.IO;
 using System.Threading;
 using System.Windows;
 
-namespace MYKCalculator
+namespace MYCCalculator
 {
     /// <summary>
     /// Interaktionslogik für MainWindow.xaml
@@ -101,7 +101,7 @@ namespace MYKCalculator
 
         private void CalculateScore()
         {
-            int currentScore = 0;
+            float currentScore = 0;
             int currentRowIndex = 1;
 
             for (; currentRowIndex < loadedDataSet.Tables[selectedTableIndex].Rows.Count; currentRowIndex++)
@@ -114,6 +114,7 @@ namespace MYKCalculator
                 if (currentRow[singleColumnIndex].ToString() == "1")
                 {
                     currentScore++;
+                    currentScore++;
                 }
 
                 // from Pos
@@ -121,8 +122,12 @@ namespace MYKCalculator
                 float outFromPos;
                 if (float.TryParse(currentRow[fromPosIndex].ToString(), out outFromPos))
                 {
-                    if (outFromPos < 127640739.7 || outFromPos > 130113749.6)
+                    if (outFromPos < 128698588f || outFromPos > 129113499f) 
+                    { 
                         currentScore++;
+                        if (outFromPos < 127564687f || outFromPos > 130692485f)
+                            currentScore++;
+                    }
                 }
 
                 // Vaf_Mean
@@ -130,30 +135,33 @@ namespace MYKCalculator
                 float outVafMean;
                 if (float.TryParse(currentRow[vafMeanIndex].ToString(), out outVafMean))
                 {
-                    if (outVafMean <= 0.03)
-                        currentScore++;
-                }
-                else
-                {
-                    int vafDiffIndex = FindIndexToColumn("Vaf_Differenz");
-                    float outVafDiff;
-                    if (float.TryParse(currentRow[vafDiffIndex].ToString(), out outVafDiff))
+                    if (outVafMean <= 0.03f)
                     {
-                        if (outVafDiff >= 0.136350466)
+                        currentScore += 1f;
+                    }
+                    else
+                    {
+                        int vafDiffIndex = FindIndexToColumn("Vaf_Differenz");
+                        float outVafDiff;
+                        if (float.TryParse(currentRow[vafDiffIndex].ToString(), out outVafDiff))
                         {
-                            int vafSR_Index = FindIndexToColumn("vaf_SR");
-                            int vafPR_Index = FindIndexToColumn("vaf_PR");
-                            float outVafSR;
-                            float outVafPR;
-                            if (float.TryParse(currentRow[vafSR_Index].ToString(), out outVafSR))
+                            if (outVafDiff >= 0.136350466f)
                             {
-                                if (outVafSR <= 0.03)
-                                    currentScore++;
-                            }
-                            else if (float.TryParse(currentRow[vafPR_Index].ToString(), out outVafPR))
-                            {
-                                if (outVafPR <= 0.03)
-                                    currentScore++;
+                                int vafSR_Index = FindIndexToColumn("vaf_SR");
+                                int vafPR_Index = FindIndexToColumn("vaf_PR");
+                                float outVafSR;
+                                float outVafPR;
+                                if (float.TryParse(currentRow[vafSR_Index].ToString(), out outVafSR))
+                                {
+                                    if (outVafSR <= 0.03f)
+                                        currentScore++;
+
+                                }
+                                else if (float.TryParse(currentRow[vafPR_Index].ToString(), out outVafPR))
+                                {
+                                    if (outVafPR <= 0.03f)
+                                        currentScore++;
+                                }
                             }
                         }
                     }
@@ -164,30 +172,32 @@ namespace MYKCalculator
                 float outReadsMean;
                 if (float.TryParse(currentRow[readsMeanIndex].ToString(), out outReadsMean))
                 {
-                    if (outReadsMean <= 5)
-                        currentScore++;
-                }
-                else
-                {
-                    int readsDiffIndex = FindIndexToColumn("Reads_Differenz");
-                    float outReadsDif;
-                    if (float.TryParse(currentRow[readsDiffIndex].ToString(), out outReadsDif))
+                    if (outReadsMean <= 5f) 
+                    { 
+                        currentScore += 1f;
+                    }
+                    else
                     {
-                        if (outReadsDif >= 24.55288628)
+                        int readsDiffIndex = FindIndexToColumn("Reads_Differenz");
+                        float outReadsDif;
+                        if (float.TryParse(currentRow[readsDiffIndex].ToString(), out outReadsDif))
                         {
-                            int readsSR_Index = FindIndexToColumn("tumor_alt_SR");
-                            int readsPR_Index = FindIndexToColumn("tumor_alt_PR");
-                            float outReadsSR;
-                            float outReadsPR;
-                            if (float.TryParse(currentRow[readsSR_Index].ToString(), out outReadsSR))
+                            if (outReadsDif >= 24.55288628f)
                             {
-                                if (outReadsSR <= 5)
-                                    currentScore++;
-                            }
-                            else if (float.TryParse(currentRow[readsPR_Index].ToString(), out outReadsPR))
-                            {
-                                if (outReadsPR <= 5)
-                                    currentScore++;
+                                int readsSR_Index = FindIndexToColumn("tumor_alt_SR");
+                                int readsPR_Index = FindIndexToColumn("tumor_alt_PR");
+                                float outReadsSR;
+                                float outReadsPR;
+                                if (float.TryParse(currentRow[readsSR_Index].ToString(), out outReadsSR))
+                                {
+                                    if (outReadsSR <= 5f)
+                                        currentScore++;
+                                }
+                                else if (float.TryParse(currentRow[readsPR_Index].ToString(), out outReadsPR))
+                                {
+                                    if (outReadsPR <= 5f)
+                                        currentScore++;
+                                }
                             }
                         }
                     }
@@ -199,24 +209,28 @@ namespace MYKCalculator
                 float outMycExp;
                 if (float.TryParse(currentRow[mycExpressionIndex].ToString(), out outMycExp))
                 {
-                    if (outMycExp <= 4.46)
+                    if (outMycExp <= 5.32f)
+                    {
                         currentScore++;
+                        if (outMycExp <= 4.46f)
+                            currentScore++;
+                    
+                            if (outMycExp <= 4.46f && (outVafMean >= 0.09f || outReadsMean >= 15f)) 
+                        { 
+                            currentScore++;
+                            
+                        }
+                    }
                 }
+                
+
 
                 // n_myl
                 int nMylIndex = FindIndexToColumn("n_myl");
                 float outNMyl;
                 if (float.TryParse(currentRow[nMylIndex].ToString(), out outNMyl))
                 {
-                    if (outNMyl == 2)
-                    {
-                        currentScore++;
-                    }
-                    else if (outNMyl > 2)
-                    {
-                        currentScore++;
-                        currentScore++;
-                    }
+                    currentScore += outNMyl;
                 }
 
 
@@ -228,7 +242,7 @@ namespace MYKCalculator
             LoadSelectedDataTable(loadedDataSet.Tables[selectedTableIndex].Copy());
         }
 
-        private void SetScore(int scoreToSet, int rowIndex)
+        private void SetScore(float scoreToSet, int rowIndex)
         {
             int scoreColumnIndex = FindIndexToColumn("Score");
             loadedDataSet.Tables[selectedTableIndex].Rows[rowIndex].ItemArray[scoreColumnIndex] = scoreToSet;
