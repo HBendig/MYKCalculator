@@ -233,7 +233,21 @@ namespace MYCCalculator
                     currentScore += outNMyl;
                 }
 
+                // Bruchpunkte
+                int bruchpunkteIndex = FindIndexToColumn("Bruchpunkt");
+                string outBruchpunkte = currentRow[bruchpunkteIndex].ToString();
+                if (outBruchpunkte.Equals("") || outBruchpunkte.Equals("c") || outBruchpunkte.Equals("t") )
+                {
+                    currentScore++;
+                }
 
+                // Partnergen
+                int partnergenIndex = FindIndexToColumn("Partnergen");
+                string outPartnergen = currentRow[partnergenIndex].ToString();
+                if (outPartnergen.Equals(""))
+                {
+                    currentScore++;
+                }
 
                 SetScore(currentScore, currentRowIndex);
             }
