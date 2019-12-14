@@ -5,17 +5,27 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MYCCalculator"
         mc:Ignorable="d"
-        Title="MYC Score" Height="450" Width="800">
+        Title="Myc Data" Height="450" Width="800">
     <Grid>
+        <TabControl>
+            <TabItem Header="Score Calculator">
+                <Grid Background="#FFE5E5E5">
+                    <Button x:Name="btn_xlsPickerButton" Content="Choose Excel-Spreadsheet" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="168" Height="36" Click="btn_xlsPickerButton_Click"/>
+                    <TextBlock x:Name="lbl_Filepath" HorizontalAlignment="Left" Margin="208,20,0,0" TextWrapping="Wrap" Text="&lt;Choose a file ...&gt;" VerticalAlignment="Top" Height="18" Width="574"/>
+                    <Button x:Name="btn_ImportData" Content="Import Data" HorizontalAlignment="Left" Margin="10,51,0,0" VerticalAlignment="Top" Width="168" Height="36" Click="btn_ImportData_Click" IsEnabled="False"/>
+                    <ComboBox x:Name="cmbbox_TableChooser" VerticalContentAlignment="Center" HorizontalAlignment="Left" Margin="208,51,0,0" VerticalAlignment="Top" Width="271" Height="36" IsEnabled="False"/>
+                    <Button x:Name="btn_CalculateScore" Content="Calculate Score" HorizontalAlignment="Left" Margin="10,92,0,0" VerticalAlignment="Top" Width="168" Height="36" IsEnabled="False" Click="btn_CalculateScore_Click"/>
+
+
+                    <DataGrid x:Name="dgrid_DataGrid" ClipboardCopyMode="IncludeHeader" ItemsSource="{Binding}" ScrollViewer.CanContentScroll="True"  MinHeight="250" Margin="10,133,10,10" MinWidth="764"/>
+
+                </Grid>
+            </TabItem>
+            <TabItem Header="Mutationsanalyse">
+                <Grid Background="#FFE5E5E5"/>
+            </TabItem>
+        </TabControl>
         
-        <Button x:Name="btn_xlsPickerButton" Content="Choose Excel-Spreadsheet" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="168" Height="36" Click="btn_xlsPickerButton_Click"/>
-        <TextBlock x:Name="lbl_Filepath" HorizontalAlignment="Left" Margin="208,20,0,0" TextWrapping="Wrap" Text="&lt;Choose a file ...&gt;" VerticalAlignment="Top" Height="18" Width="574"/>
-        <Button x:Name="btn_ImportData" Content="Import Data" HorizontalAlignment="Left" Margin="10,51,0,0" VerticalAlignment="Top" Width="168" Height="36" Click="btn_ImportData_Click" IsEnabled="False"/>
-        <ComboBox x:Name="cmbbox_TableChooser" VerticalContentAlignment="Center" HorizontalAlignment="Left" Margin="208,51,0,0" VerticalAlignment="Top" Width="271" Height="36" IsEnabled="False"/>
-        <Button x:Name="btn_CalculateScore" Content="Calculate Score" HorizontalAlignment="Left" Margin="10,92,0,0" VerticalAlignment="Top" Width="168" Height="36" IsEnabled="False" Click="btn_CalculateScore_Click"/>
-
-
-        <DataGrid x:Name="dgrid_DataGrid" ClipboardCopyMode="IncludeHeader" ItemsSource="{Binding}" ScrollViewer.CanContentScroll="True"  MinHeight="280" Margin="10,140,10,10" MinWidth="764"/>
 
     </Grid>
 </Window>
