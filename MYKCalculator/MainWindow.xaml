@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MYCCalculator"
         mc:Ignorable="d"
-        Title="Myc Data" Height="450" Width="800">
+        Title="Myc Data" Height="460" Width="820">
     <Grid>
         <TabControl>
             <TabItem Header="Score Calculator">
@@ -22,10 +22,21 @@
                 </Grid>
             </TabItem>
             <TabItem Header="Mutationsanalyse">
-                <Grid Background="#FFE5E5E5"/>
+                <Grid Background="#FFE5E5E5">
+                    <Button x:Name="btn_xlsPickerButton2" Content="Choose Excel-Spreadsheet" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="168" Height="36" Click="btn_xlsPickerButton2_Click"/>
+                    <TextBlock x:Name="lbl_Filepath2" HorizontalAlignment="Left" Margin="208,20,0,0" TextWrapping="Wrap" Text="&lt;Choose a file ...&gt;" VerticalAlignment="Top" Height="18" Width="574"/>
+                    <Button x:Name="btn_ImportData2" Content="Import Data" HorizontalAlignment="Left" Margin="10,51,0,0" VerticalAlignment="Top" Width="168" Height="36" Click="btn_ImportData2_Click" IsEnabled="False"/>
+                    <ComboBox x:Name="cmbbox_TableChooser2" VerticalContentAlignment="Center" HorizontalAlignment="Left" Margin="208,51,0,0" VerticalAlignment="Top" Width="271" Height="36" IsEnabled="False"/>
+                    <Button x:Name="btn_Analyse" Content="Analyse Data" HorizontalAlignment="Left" Margin="10,92,0,0" VerticalAlignment="Top" Width="168" Height="36" IsEnabled="False" Click="btn_Analyse_Click"/>
+
+
+                    <DataGrid x:Name="dgrid_DataGrid2" ClipboardCopyMode="IncludeHeader" ItemsSource="{Binding}" ScrollViewer.CanContentScroll="True"  MinHeight="250" Margin="10,133,10,10" MinWidth="764"/>
+
+                </Grid>
             </TabItem>
         </TabControl>
-        
-
+        <Grid Background="White" Opacity="0.75" x:Name="LoadingGrid">
+            <TextBlock Text="... LOADING ..." HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" FontSize="16"/>
+        </Grid>
     </Grid>
 </Window>
