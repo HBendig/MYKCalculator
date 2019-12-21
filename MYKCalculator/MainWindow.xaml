@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MYCCalculator"
         mc:Ignorable="d"
-        Title="Myc Data" Height="460" Width="820">
+        Title="Myc Data" Height="768" Width="1024">
     <Grid>
         <TabControl>
             <TabItem Header="Score Calculator">
@@ -34,8 +34,26 @@
 
                 </Grid>
             </TabItem>
+            <TabItem Header="Mutationsanalyse2">
+                <Grid Background="#FFE5E5E5">
+                    <Button x:Name="btn_xlsPickerButton3" Content="Datasource" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="83" Height="36" Click="btn_xlsPickerButton3_Click"/>
+                    <TextBlock x:Name="lbl_Filepath3" HorizontalAlignment="Left" Margin="208,20,0,0" TextWrapping="Wrap" Text="&lt;Choose a datasource ...&gt;" VerticalAlignment="Top" Height="26" Width="384" TextTrimming="CharacterEllipsis" ScrollViewer.VerticalScrollBarVisibility="Disabled"/>
+                    <Button x:Name="btn_xlsPickerButton_template3" Content="Template" HorizontalAlignment="Left" Margin="98,10,0,0" VerticalAlignment="Top" Width="80" Height="36" Click="btn_xlsPickerButtonTemplate3_Click"/>
+                    <TextBlock x:Name="lbl_Filepath_template3" HorizontalAlignment="Left" Margin="618,20,10,0" TextWrapping="Wrap" Text="&lt;Choose a template ...&gt;" VerticalAlignment="Top" Height="26" Width="382" TextTrimming="CharacterEllipsis"/>
+                    <Button x:Name="btn_ImportData3" Content="Import Data" HorizontalAlignment="Left" Margin="10,51,0,0" VerticalAlignment="Top" Width="168" Height="36" Click="btn_ImportData3_Click" IsEnabled="False"/>
+                    <ComboBox x:Name="cmbbox_TableChooser3" VerticalContentAlignment="Center" HorizontalAlignment="Left" Margin="208,51,0,0" VerticalAlignment="Top" Width="384" Height="36" IsEnabled="False"/>
+                    <ComboBox x:Name="cmbbox_TableChooserTemplate3" VerticalContentAlignment="Center" HorizontalAlignment="Left" Margin="618,51,0,0" VerticalAlignment="Top" Width="370" Height="36" IsEnabled="False"/>
+                    <Button x:Name="btn_ReadData" Content="Read Data" HorizontalAlignment="Left" Margin="208,92,0,0" VerticalAlignment="Top" Width="168" Height="36" IsEnabled="False" Click="btn_ReadData_Click"/>
+                    <Button x:Name="btn_SetTemplate" Content="Set Template" HorizontalAlignment="Left" Margin="618,92,0,0" VerticalAlignment="Top" Width="168" Height="36" IsEnabled="False" Click="btn_SetTemplate_Click"/>
+
+
+                    <DataGrid x:Name="dgrid_DataGrid3" ClipboardCopyMode="IncludeHeader" ItemsSource="{Binding}" ScrollViewer.CanContentScroll="True"  MinHeight="250" Margin="10,133,10,223" MinWidth="764"/>
+                    <DataGrid x:Name="dgrid_DataGridTemplate3" ClipboardCopyMode="IncludeHeader" ItemsSource="{Binding}" ScrollViewer.CanContentScroll="True"  MinHeight="200" Margin="10,491,10,10" MinWidth="764"/>
+
+                </Grid>
+            </TabItem>
         </TabControl>
-        <Grid Background="White" Opacity="0.75" x:Name="LoadingGrid">
+        <Grid Background="White" Opacity="0.75" x:Name="LoadingGrid" Margin="10,10,-10,-10">
             <TextBlock Text="... LOADING ..." HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" FontSize="16"/>
         </Grid>
     </Grid>

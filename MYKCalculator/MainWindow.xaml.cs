@@ -26,13 +26,23 @@ namespace MYCCalculator
     {
         private string dataPath = "";
         private string dataPath_mutations = "";
+        private string dataPath_mutations2 = "";
+        private string dataPath_mutationsTemplate2 = "";
 
         private DataSet loadedDataSet;
         private DataSet loadedDataSet_mutations;
+        private DataSet loadedDataSet_mutations2;
+        private DataSet loadedDataSet_mutationsTemplate2;
         private int selectedTableIndex;
         private int selectedTableIndex_mutations;
+        private int selectedTableIndex_mutations2;
+        private int selectedTableIndex_mutationsTemplate2;
 
-        List<string> csvLines = new List<string>();
+        private List<string> csvLines = new List<string>();
+        private Dictionary<string, int> genList = new Dictionary<string, int>();
+        private List<Patient> patientList = new List<Patient>();
+
+        private List<string> csvLines2 = new List<string>();
 
         public MainWindow()
         {
@@ -40,6 +50,8 @@ namespace MYCCalculator
 
             cmbbox_TableChooser.SelectionChanged += Cmbbox_TableChooser_SelectionChanged;
             cmbbox_TableChooser2.SelectionChanged += Cmbbox_TableChooser_mutations_SelectionChanged;
+            cmbbox_TableChooser3.SelectionChanged += Cmbbox_TableChooser_mutations2_SelectionChanged;
+            cmbbox_TableChooserTemplate3.SelectionChanged += Cmbbox_TableChooser_mutationsTemplate2_SelectionChanged;
 
             LoadingGrid.IsEnabled = false;
             LoadingGrid.Visibility = Visibility.Hidden;
@@ -55,6 +67,18 @@ namespace MYCCalculator
             selectedTableIndex_mutations = cmbbox_TableChooser2.SelectedIndex;
             LoadSelectedDataTable_mutations(loadedDataSet_mutations.Tables[selectedTableIndex_mutations].Copy());
         }
+        private void Cmbbox_TableChooser_mutations2_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            Dispatcher.Invoke(() => ShowLoadingScreen(true));
+            selectedTableIndex_mutations2 = cmbbox_TableChooser3.SelectedIndex;
+            LoadSelectedDataTable_mutations2(loadedDataSet_mutations2.Tables[selectedTableIndex_mutations2].Copy());
+        }
+        private void Cmbbox_TableChooser_mutationsTemplate2_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            Dispatcher.Invoke(() => ShowLoadingScreen(true));
+            selectedTableIndex_mutationsTemplate2 = cmbbox_TableChooserTemplate3.SelectedIndex;
+            LoadSelectedDataTable_mutationsTemplate2(loadedDataSet_mutationsTemplate2.Tables[selectedTableIndex_mutationsTemplate2].Copy());
+        }
 
         private void btn_xlsPickerButton_Click(object sender, RoutedEventArgs e)
         {
@@ -66,7 +90,6 @@ namespace MYCCalculator
                 btn_ImportData.IsEnabled = true;
             }
         }
-
         private void btn_xlsPickerButton2_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -77,10 +100,43 @@ namespace MYCCalculator
                 btn_ImportData2.IsEnabled = true;
             }
         }
+        private void btn_xlsPickerButton3_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Excel Worksheets|*.xls;*.xlsx;*.xlsm";
+            if (openFileDialog.ShowDialog() == true)
+            {
+                dataPath_mutations2 = lbl_Filepath3.Text = openFileDialog.FileName;
+                
+                if(dataPath_mutationsTemplate2 != "")
+                    btn_ImportData3.IsEnabled = true;
+            }
+        }
+        private void btn_xlsPickerButtonTemplate3_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Excel Worksheets|*.xls;*.xlsx;*.xlsm";
+            if (openFileDialog.ShowDialog() == true)
+            {
+                dataPath_mutationsTemplate2 = lbl_Filepath_template3.Text = openFileDialog.FileName;
+                if(dataPath_mutations2 != "")
+                    btn_ImportData3.IsEnabled = true;
+            }
+        }
 
+        private void btn_ImportData_Click(object sender, RoutedEventArgs e)
+        {
+            Thread importThread = new Thread(new ThreadStart(ImportXLSData));
+            importThread.Start();
+        }
         private void btn_ImportData2_Click(object sender, RoutedEventArgs e)
         {
             Thread importThread = new Thread(new ThreadStart(ImportXLSData_Mutations));
+            importThread.Start();
+        }
+        private void btn_ImportData3_Click(object sender, RoutedEventArgs e)
+        {
+            Thread importThread = new Thread(new ThreadStart(ImportXLSData_Mutations2));
             importThread.Start();
         }
 
@@ -110,13 +166,56 @@ namespace MYCCalculator
             Dispatcher.Invoke((() => FillCombobox2(tableNames))); ;
             Dispatcher.Invoke(() => ShowLoadingScreen(false));
         }
-
-        private void btn_ImportData_Click(object sender, RoutedEventArgs e)
+        private void ImportXLSData_Mutations2()
         {
-            Thread importThread = new Thread(new ThreadStart(ImportXLSData));
-            importThread.Start();
-        }
+            Dispatcher.Invoke(() => ShowLoadingScreen(true));
 
+            // Datasrc
+            using (var stream = File.Open(dataPath_mutations2, FileMode.Open, FileAccess.Read))
+            {
+                // Auto-detect format, supports:
+                //  - Binary Excel files (2.0-2003 format; *.xls)
+                //  - OpenXml Excel files (2007 format; *.xlsx)
+                using (var reader = ExcelReaderFactory.CreateReader(stream))
+                {
+                    // Use the AsDataSet extension method
+                    loadedDataSet_mutations2 = reader.AsDataSet();
+                }
+            }
+
+            // Combobox zur Tabellenwahl füllen
+            List<string> tableNames = new List<string>();
+            foreach (DataTable dataTable in loadedDataSet_mutations2.Tables)
+            {
+                tableNames.Add(dataTable.TableName);
+            }
+
+            // Template
+            using (var stream = File.Open(dataPath_mutationsTemplate2, FileMode.Open, FileAccess.Read))
+            {
+                // Auto-detect format, supports:
+                //  - Binary Excel files (2.0-2003 format; *.xls)
+                //  - OpenXml Excel files (2007 format; *.xlsx)
+                using (var reader = ExcelReaderFactory.CreateReader(stream))
+                {
+                    // Use the AsDataSet extension method
+                    loadedDataSet_mutationsTemplate2 = reader.AsDataSet();
+                }
+            }
+
+            // Combobox zur Tabellenwahl füllen
+            List<string> tableNames_template = new List<string>();
+            foreach (DataTable dataTable in loadedDataSet_mutationsTemplate2.Tables)
+            {
+                tableNames_template.Add(dataTable.TableName);
+            }
+            // Template reseten
+            templateDic = null;
+
+            Dispatcher.Invoke((() => FillCombobox3(tableNames))); 
+            Dispatcher.Invoke((() => FillComboboxTemplate3(tableNames_template))); 
+            Dispatcher.Invoke(() => ShowLoadingScreen(false));
+        }
         private void ImportXLSData()
         {
             Dispatcher.Invoke(() => ShowLoadingScreen(true));
@@ -163,31 +262,78 @@ namespace MYCCalculator
             cmbbox_TableChooser.IsEnabled = true;
             cmbbox_TableChooser.SelectedIndex = 0;
         }
-        
         private void FillCombobox2(List<string> tableNames)
         {
             cmbbox_TableChooser2.ItemsSource = tableNames;
             cmbbox_TableChooser2.IsEnabled = true;
             cmbbox_TableChooser2.SelectedIndex = 0;
         }
+        private void FillCombobox3(List<string> tableNames)
+        {
+            cmbbox_TableChooser3.ItemsSource = tableNames;
+            cmbbox_TableChooser3.IsEnabled = true;
+            cmbbox_TableChooser3.SelectedIndex = 0;
+        }
+        private void FillComboboxTemplate3(List<string> tableNames)
+        {
+            cmbbox_TableChooserTemplate3.ItemsSource = tableNames;
+            cmbbox_TableChooserTemplate3.IsEnabled = true;
+            cmbbox_TableChooserTemplate3.SelectedIndex = 0;
+        }
 
         private void LoadSelectedDataTable(DataTable loadedTable)
         {
+            Dispatcher.Invoke(() => ShowLoadingScreen(true));
+
             dgrid_DataGrid.DataContext = loadedTable;
             SetColumnNames(loadedTable);
 
             loadedTable.Rows[0].Delete();
             loadedTable.AcceptChanges();
             btn_CalculateScore.IsEnabled = true;
+
+            Dispatcher.Invoke(() => ShowLoadingScreen(false));
         }
         private void LoadSelectedDataTable_mutations(DataTable loadedTable)
         {
+            Dispatcher.Invoke(() => ShowLoadingScreen(true));
+
             dgrid_DataGrid2.DataContext = loadedTable;
             SetColumnNames_mutations(loadedTable);
 
             loadedTable.Rows[0].Delete();
             loadedTable.AcceptChanges();
             btn_Analyse.IsEnabled = true;
+
+            Dispatcher.Invoke(() => ShowLoadingScreen(false));
+        }
+        private void LoadSelectedDataTable_mutations2(DataTable loadedTable)
+        {
+            Dispatcher.Invoke(() => ShowLoadingScreen(true));
+            dgrid_DataGrid3.DataContext = loadedTable;
+            SetColumnNames_mutations2(loadedTable);
+
+            loadedTable.Rows[0].Delete();
+            loadedTable.AcceptChanges();
+            // btn_ReadData.IsEnabled = false;
+            //if(templateDic == null)
+            //    btn_SetTemplate.IsEnabled = true;
+
+            Dispatcher.Invoke(() => ShowLoadingScreen(false));
+        }
+        private void LoadSelectedDataTable_mutationsTemplate2(DataTable loadedTable)
+        {
+            ShowLoadingScreen(true);
+            btn_SetTemplate.IsEnabled = false;
+            dgrid_DataGridTemplate3.DataContext = loadedTable;
+            SetColumnNames_mutationsTemplate2(loadedTable);
+
+            loadedTable.Rows[0].Delete();
+            loadedTable.AcceptChanges();
+            if (templateDic == null)
+                btn_SetTemplate.IsEnabled = true;
+
+            ShowLoadingScreen(false);
         }
 
         private void SetColumnNames(DataTable data)
@@ -203,6 +349,20 @@ namespace MYCCalculator
             {
                 dgrid_DataGrid2.Columns[n].Header = data.Rows[0].ItemArray[n];
             }
+        } 
+        private void SetColumnNames_mutations2(DataTable data)
+        {
+            for (int n = 0; n < dgrid_DataGrid3.Columns.Count; n++)
+            {
+                dgrid_DataGrid3.Columns[n].Header = data.Rows[0].ItemArray[n];
+            }
+        }
+        private void SetColumnNames_mutationsTemplate2(DataTable data)
+        {
+            for (int n = 0; n < dgrid_DataGridTemplate3.Columns.Count; n++)
+            {
+                dgrid_DataGridTemplate3.Columns[n].Header = data.Rows[0].ItemArray[n];
+            }
         }
 
         private void CalculateScore()
@@ -216,7 +376,7 @@ namespace MYCCalculator
                 DataRow currentRow = loadedDataSet.Tables[selectedTableIndex].Rows[currentRowIndex];
 
                 // single
-                int singleColumnIndex = FindIndexToColumn("single");
+                int singleColumnIndex = FindIndexToColumn("single", loadedDataSet.Tables[selectedTableIndex].Rows[0].ItemArray);
                 if (currentRow[singleColumnIndex].ToString() == "1")
                 {
                     currentScore++;
@@ -224,7 +384,7 @@ namespace MYCCalculator
                 }
 
                 // from Pos
-                int fromPosIndex = FindIndexToColumn("from_pos");
+                int fromPosIndex = FindIndexToColumn("from_pos", loadedDataSet.Tables[selectedTableIndex].Rows[0].ItemArray);
                 float outFromPos;
                 if (float.TryParse(currentRow[fromPosIndex].ToString(), out outFromPos))
                 {
@@ -237,7 +397,7 @@ namespace MYCCalculator
                 }
 
                 // Vaf_Mean
-                int vafMeanIndex = FindIndexToColumn("Vaf_Mean");
+                int vafMeanIndex = FindIndexToColumn("Vaf_Mean", loadedDataSet.Tables[selectedTableIndex].Rows[0].ItemArray);
                 float outVafMean;
                 if (float.TryParse(currentRow[vafMeanIndex].ToString(), out outVafMean))
                 {
@@ -247,14 +407,14 @@ namespace MYCCalculator
                     }
                     else
                     {
-                        int vafDiffIndex = FindIndexToColumn("Vaf_Differenz");
+                        int vafDiffIndex = FindIndexToColumn("Vaf_Differenz", loadedDataSet.Tables[selectedTableIndex].Rows[0].ItemArray);
                         float outVafDiff;
                         if (float.TryParse(currentRow[vafDiffIndex].ToString(), out outVafDiff))
                         {
                             if (outVafDiff >= 0.136350466f)
                             {
-                                int vafSR_Index = FindIndexToColumn("vaf_SR");
-                                int vafPR_Index = FindIndexToColumn("vaf_PR");
+                                int vafSR_Index = FindIndexToColumn("vaf_SR", loadedDataSet.Tables[selectedTableIndex].Rows[0].ItemArray);
+                                int vafPR_Index = FindIndexToColumn("vaf_PR", loadedDataSet.Tables[selectedTableIndex].Rows[0].ItemArray);
                                 float outVafSR;
                                 float outVafPR;
                                 if (float.TryParse(currentRow[vafSR_Index].ToString(), out outVafSR))
@@ -274,7 +434,7 @@ namespace MYCCalculator
                 }
 
                 // Reads_Mean
-                int readsMeanIndex = FindIndexToColumn("Reads_Mean");
+                int readsMeanIndex = FindIndexToColumn("Reads_Mean", loadedDataSet.Tables[selectedTableIndex].Rows[0].ItemArray);
                 float outReadsMean;
                 if (float.TryParse(currentRow[readsMeanIndex].ToString(), out outReadsMean))
                 {
@@ -284,14 +444,14 @@ namespace MYCCalculator
                     }
                     else
                     {
-                        int readsDiffIndex = FindIndexToColumn("Reads_Differenz");
+                        int readsDiffIndex = FindIndexToColumn("Reads_Differenz", loadedDataSet.Tables[selectedTableIndex].Rows[0].ItemArray);
                         float outReadsDif;
                         if (float.TryParse(currentRow[readsDiffIndex].ToString(), out outReadsDif))
                         {
                             if (outReadsDif >= 24.55288628f)
                             {
-                                int readsSR_Index = FindIndexToColumn("tumor_alt_SR");
-                                int readsPR_Index = FindIndexToColumn("tumor_alt_PR");
+                                int readsSR_Index = FindIndexToColumn("tumor_alt_SR", loadedDataSet.Tables[selectedTableIndex].Rows[0].ItemArray);
+                                int readsPR_Index = FindIndexToColumn("tumor_alt_PR", loadedDataSet.Tables[selectedTableIndex].Rows[0].ItemArray);
                                 float outReadsSR;
                                 float outReadsPR;
                                 if (float.TryParse(currentRow[readsSR_Index].ToString(), out outReadsSR))
@@ -311,7 +471,7 @@ namespace MYCCalculator
 
 
                 // MYC Expression
-                int mycExpressionIndex = FindIndexToColumn("MYC Expression");
+                int mycExpressionIndex = FindIndexToColumn("MYC Expression", loadedDataSet.Tables[selectedTableIndex].Rows[0].ItemArray);
                 float outMycExp;
                 if (float.TryParse(currentRow[mycExpressionIndex].ToString(), out outMycExp))
                 {
@@ -332,7 +492,7 @@ namespace MYCCalculator
 
 
                 // n_myl
-                int nMylIndex = FindIndexToColumn("n_myl");
+                int nMylIndex = FindIndexToColumn("n_myl", loadedDataSet.Tables[selectedTableIndex].Rows[0].ItemArray);
                 float outNMyl;
                 if (float.TryParse(currentRow[nMylIndex].ToString(), out outNMyl))
                 {
@@ -340,7 +500,7 @@ namespace MYCCalculator
                 }
 
                 // Bruchpunkte
-                int bruchpunkteIndex = FindIndexToColumn("Bruchpunkt");
+                int bruchpunkteIndex = FindIndexToColumn("Bruchpunkt", loadedDataSet.Tables[selectedTableIndex].Rows[0].ItemArray);
                 string outBruchpunkte = currentRow[bruchpunkteIndex].ToString();
                 if (outBruchpunkte.Equals("") || outBruchpunkte.Equals("c") || outBruchpunkte.Equals("t") )
                 {
@@ -348,7 +508,7 @@ namespace MYCCalculator
                 }
 
                 // Partnergen
-                int partnergenIndex = FindIndexToColumn("Partnergen");
+                int partnergenIndex = FindIndexToColumn("Partnergen", loadedDataSet.Tables[selectedTableIndex].Rows[0].ItemArray);
                 string outPartnergen = currentRow[partnergenIndex].ToString();
                 if (outPartnergen.Equals(""))
                 {
@@ -364,16 +524,16 @@ namespace MYCCalculator
 
         private void SetScore(float scoreToSet, int rowIndex)
         {
-            int scoreColumnIndex = FindIndexToColumn("Score");
+            int scoreColumnIndex = FindIndexToColumn("Score", loadedDataSet.Tables[selectedTableIndex].Rows[0].ItemArray);
             loadedDataSet.Tables[selectedTableIndex].Rows[rowIndex].ItemArray[scoreColumnIndex] = scoreToSet;
             loadedDataSet.Tables[selectedTableIndex].Rows[rowIndex].SetField(scoreColumnIndex, scoreToSet);
             loadedDataSet.Tables[selectedTableIndex].Rows[rowIndex].AcceptChanges();
         }
 
-        private int FindIndexToColumn(string searchKeyword)
+        private int FindIndexToColumn(string searchKeyword, object[] data)
         {
             List<string> headerList = new List<string>();
-            foreach (object obj in loadedDataSet.Tables[selectedTableIndex].Rows[0].ItemArray)
+            foreach (object obj in data)
             {
                 headerList.Add(obj.ToString());
             }
@@ -387,13 +547,9 @@ namespace MYCCalculator
            
         }
 
-        Dictionary<string, int> genList = new Dictionary<string, int>();
-        List<Patient> patientList = new List<Patient>();
 
         private void btn_Analyse_Click(object sender, RoutedEventArgs e)
         {
-            List<string> alreadyChecked = new List<string>();
-
             for (int currentRowIndex = 1; currentRowIndex < loadedDataSet_mutations.Tables[selectedTableIndex_mutations].Rows.Count; currentRowIndex++)
             {
                 DataRow currentRow = loadedDataSet_mutations.Tables[selectedTableIndex_mutations].Rows[currentRowIndex];
@@ -467,11 +623,159 @@ namespace MYCCalculator
             }
 
             WriteCSV(csvLines.ToArray());
-        }  
-        
+        }
+        private void btn_Analyse2_Click(object sender, RoutedEventArgs e)
+        {
+
+            for (int currentRowIndex = 1; currentRowIndex < loadedDataSet_mutations2.Tables[selectedTableIndex_mutations].Rows.Count; currentRowIndex++)
+            {
+                DataRow currentRow = loadedDataSet_mutations2.Tables[selectedTableIndex_mutations].Rows[currentRowIndex];
+                Patient patient = new Patient();
+
+                patient.ArrayID = currentRow[0].ToString();
+                patient.Entitaet = currentRow[2].ToString();
+
+
+                for (int currentColumnIndex = 4; currentColumnIndex < loadedDataSet_mutations2.Tables[selectedTableIndex_mutations].Columns.Count; currentColumnIndex++)
+                {
+                    string currentGen = currentRow[currentColumnIndex].ToString();
+                    if (currentGen != "")
+                    {
+                        if (genList.ContainsKey(currentGen))
+                        {
+                            genList[currentGen]++;
+                        }
+                        else
+                        {
+                            genList.Add(currentGen, 1);
+                        }
+
+                        if (patient.GenListe.ContainsKey(currentGen))
+                        {
+                            patient.GenListe[currentGen]++;
+                        }
+                        else
+                        {
+                            patient.GenListe.Add(currentGen, 1);
+                        }
+                    }
+                }
+
+                patientList.Add(patient);
+            }
+
+            foreach (KeyValuePair<string, int> kvp in genList)
+            {
+                Console.WriteLine(string.Format("{0} : {1}", kvp.Key, kvp.Value));
+
+            }
+
+            Console.WriteLine("Patienten: " + patientList.Count);
+
+
+            DataTable dt = dgrid_DataGrid3.DataContext as DataTable;
+
+            csvLines.Add("ArrayID;Entitaet;");
+
+            foreach (KeyValuePair<string, int> kvp in genList)
+            {
+                csvLines[0] += kvp.Key + ";";
+            }
+
+            foreach (Patient p in patientList)
+            {
+
+                DataRow dr = dt.NewRow();
+                csvLines.Add(p.ArrayID + ";" + p.Entitaet + ";");
+
+                foreach (KeyValuePair<string, int> kvp in genList)
+                {
+                    if (p.GenListe.ContainsKey(kvp.Key))
+                    {
+                        csvLines[csvLines.Count - 1] += p.GenListe[kvp.Key];
+                    }
+
+                    csvLines[csvLines.Count - 1] += ";";
+                }
+            }
+
+            WriteCSV(csvLines.ToArray());
+        }
+
         private void WriteCSV(string[] lines)
         {
             System.IO.File.WriteAllLines("data.csv", lines);
+        }
+
+        private Dictionary<string, Dictionary<string, int>> ResultDataset = new Dictionary<string, Dictionary<string, int>>();
+        private void btn_ReadData_Click(object sender, RoutedEventArgs e)
+        {
+            Dispatcher.Invoke(() => ShowLoadingScreen(true));
+
+            Dictionary<string, int> countList = new Dictionary<string, int>( templateDic );
+            for (int currentRowIndex = 1; currentRowIndex < loadedDataSet_mutations2.Tables[selectedTableIndex_mutations2].Rows.Count; currentRowIndex++)
+            {
+                DataRow currentRow = loadedDataSet_mutations2.Tables[selectedTableIndex_mutations2].Rows[currentRowIndex];
+                int index = FindIndexToColumn("symbol", loadedDataSet_mutations2.Tables[selectedTableIndex_mutations2].Rows[0].ItemArray);
+
+                string currentEntity = currentRow[index].ToString();
+                if (countList.ContainsKey(currentEntity))
+                {
+                    countList[currentEntity] += 1;
+                }
+            }
+
+            if(!ResultDataset.ContainsKey(cmbbox_TableChooser3.Text))
+                ResultDataset.Add(cmbbox_TableChooser3.Text, countList);
+
+            DataRow headlineRow = loadedDataSet_mutationsTemplate2.Tables[selectedTableIndex_mutationsTemplate2].Rows[0];
+            for (int currentRowIndex = 1; currentRowIndex < loadedDataSet_mutationsTemplate2.Tables[selectedTableIndex_mutationsTemplate2].Rows.Count; currentRowIndex++)
+            {
+                DataRow currentRow = loadedDataSet_mutationsTemplate2.Tables[selectedTableIndex_mutationsTemplate2].Rows[currentRowIndex];
+                string currentEntity = currentRow[0].ToString();
+                if (currentEntity == cmbbox_TableChooser3.Text)
+                {
+                    for (int currentColumnIndex = 2; currentColumnIndex < loadedDataSet_mutationsTemplate2.Tables[selectedTableIndex_mutationsTemplate2].Columns.Count; currentColumnIndex++)
+                    {
+
+                        currentRow[currentColumnIndex] = countList[headlineRow[currentColumnIndex].ToString()];
+                    }
+                }
+            }
+
+
+            // Refresh data
+            LoadSelectedDataTable_mutationsTemplate2(loadedDataSet_mutationsTemplate2.Tables[selectedTableIndex_mutationsTemplate2].Copy());
+
+            Dispatcher.Invoke(() => ShowLoadingScreen(false));
+        }
+
+        private Dictionary<string, int> templateDic; 
+        private void btn_SetTemplate_Click(object sender, RoutedEventArgs e)
+        {
+            Dispatcher.Invoke(() => ShowLoadingScreen(true));
+
+            ResultDataset = new Dictionary<string, Dictionary<string, int>>();
+
+            DataRow currentRow = loadedDataSet_mutationsTemplate2.Tables[selectedTableIndex_mutationsTemplate2].Rows[0];
+            templateDic = new Dictionary<string, int>();
+
+            for (int currentColumnIndex = 2; currentColumnIndex < loadedDataSet_mutationsTemplate2.Tables[selectedTableIndex_mutationsTemplate2].Columns.Count; currentColumnIndex++)
+            {
+                string currentEntity = currentRow[currentColumnIndex].ToString();
+                if (currentEntity != "")
+                {
+                    if (!templateDic.ContainsKey(currentEntity))
+                    {
+                        templateDic.Add(currentEntity, 0);
+                    }
+                }
+            }
+            
+            btn_ReadData.IsEnabled = true;
+            btn_SetTemplate.IsEnabled = false;
+
+            Dispatcher.Invoke(() => ShowLoadingScreen(false));
         }
     }
 }
