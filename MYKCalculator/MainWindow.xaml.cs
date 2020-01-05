@@ -212,9 +212,10 @@ namespace MYCCalculator
             // Template reseten
             templateDic = null;
 
-            Dispatcher.Invoke((() => FillCombobox3(tableNames))); 
-            Dispatcher.Invoke((() => FillComboboxTemplate3(tableNames_template))); 
-            Dispatcher.Invoke(() => ShowLoadingScreen(false));
+            Dispatcher.Invoke((() => FillCombobox3(tableNames)));
+            Dispatcher.Invoke(()  => FillComboboxTemplate3(tableNames_template));
+            Dispatcher.Invoke(()  => chkbx_SingleCount.IsEnabled = true);
+            Dispatcher.Invoke(()  => ShowLoadingScreen(false));
         }
         private void ImportXLSData()
         {
@@ -711,17 +712,30 @@ namespace MYCCalculator
         private void btn_ReadData_Click(object sender, RoutedEventArgs e)
         {
             Dispatcher.Invoke(() => ShowLoadingScreen(true));
-
+            List<string> patientAlreadyCounted = new List<string>();
             Dictionary<string, int> countList = new Dictionary<string, int>( templateDic );
             for (int currentRowIndex = 1; currentRowIndex < loadedDataSet_mutations2.Tables[selectedTableIndex_mutations2].Rows.Count; currentRowIndex++)
             {
                 DataRow currentRow = loadedDataSet_mutations2.Tables[selectedTableIndex_mutations2].Rows[currentRowIndex];
                 int index = FindIndexToColumn("symbol", loadedDataSet_mutations2.Tables[selectedTableIndex_mutations2].Rows[0].ItemArray);
-
+                string currentPatientID = currentRow[FindIndexToColumn("array_id", loadedDataSet_mutations2.Tables[selectedTableIndex_mutations2].Rows[0].ItemArray)].ToString();
                 string currentEntity = currentRow[index].ToString();
+
                 if (countList.ContainsKey(currentEntity))
                 {
-                    countList[currentEntity] += 1;
+                    if ((bool)chkbx_SingleCount.IsChecked)
+                    {
+                        string combination = currentPatientID + "_" + currentEntity;
+                        if (!patientAlreadyCounted.Contains(combination))
+                        {
+                            patientAlreadyCounted.Add(combination);
+                            countList[currentEntity] += 1;
+                        }
+                    }
+                    else
+                    {
+                        countList[currentEntity] += 1;
+                    }
                 }
             }
 
@@ -737,8 +751,8 @@ namespace MYCCalculator
                 {
                     for (int currentColumnIndex = 2; currentColumnIndex < loadedDataSet_mutationsTemplate2.Tables[selectedTableIndex_mutationsTemplate2].Columns.Count; currentColumnIndex++)
                     {
-
-                        currentRow[currentColumnIndex] = countList[headlineRow[currentColumnIndex].ToString()];
+                        if(headlineRow[currentColumnIndex].ToString() != "")
+                            currentRow[currentColumnIndex] = countList[headlineRow[currentColumnIndex].ToString()];
                     }
                 }
             }

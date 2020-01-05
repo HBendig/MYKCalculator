@@ -41,19 +41,20 @@
                     <Button x:Name="btn_xlsPickerButton_template3" Content="Template" HorizontalAlignment="Left" Margin="98,10,0,0" VerticalAlignment="Top" Width="80" Height="36" Click="btn_xlsPickerButtonTemplate3_Click"/>
                     <TextBlock x:Name="lbl_Filepath_template3" HorizontalAlignment="Left" Margin="618,20,10,0" TextWrapping="Wrap" Text="&lt;Choose a template ...&gt;" VerticalAlignment="Top" Height="26" Width="382" TextTrimming="CharacterEllipsis"/>
                     <Button x:Name="btn_ImportData3" Content="Import Data" HorizontalAlignment="Left" Margin="10,51,0,0" VerticalAlignment="Top" Width="168" Height="36" Click="btn_ImportData3_Click" IsEnabled="False"/>
+                    <CheckBox x:Name="chkbx_SingleCount" Content="Single Count" HorizontalAlignment="Left" Margin="10,91,0,0" VerticalAlignment="Top" Width="168" Height="36" IsEnabled="False"/>
                     <ComboBox x:Name="cmbbox_TableChooser3" VerticalContentAlignment="Center" HorizontalAlignment="Left" Margin="208,51,0,0" VerticalAlignment="Top" Width="384" Height="36" IsEnabled="False"/>
                     <ComboBox x:Name="cmbbox_TableChooserTemplate3" VerticalContentAlignment="Center" HorizontalAlignment="Left" Margin="618,51,0,0" VerticalAlignment="Top" Width="370" Height="36" IsEnabled="False"/>
                     <Button x:Name="btn_ReadData" Content="Read Data" HorizontalAlignment="Left" Margin="208,92,0,0" VerticalAlignment="Top" Width="168" Height="36" IsEnabled="False" Click="btn_ReadData_Click"/>
                     <Button x:Name="btn_SetTemplate" Content="Set Template" HorizontalAlignment="Left" Margin="618,92,0,0" VerticalAlignment="Top" Width="168" Height="36" IsEnabled="False" Click="btn_SetTemplate_Click"/>
 
 
-                    <DataGrid x:Name="dgrid_DataGrid3" ClipboardCopyMode="IncludeHeader" ItemsSource="{Binding}" ScrollViewer.CanContentScroll="True"  MinHeight="250" Margin="10,133,10,223" MinWidth="764"/>
-                    <DataGrid x:Name="dgrid_DataGridTemplate3" ClipboardCopyMode="IncludeHeader" ItemsSource="{Binding}" ScrollViewer.CanContentScroll="True"  MinHeight="200" Margin="10,491,10,10" MinWidth="764"/>
+                    <DataGrid x:Name="dgrid_DataGrid3" ClipboardCopyMode="IncludeHeader" ItemsSource="{Binding}" ScrollViewer.CanContentScroll="True"  MinHeight="150" Margin="10,133,10,397" MinWidth="764"/>
+                    <DataGrid x:Name="dgrid_DataGridTemplate3" ClipboardCopyMode="IncludeHeader" ItemsSource="{Binding}" ScrollViewer.CanContentScroll="True"  MinHeight="200" Margin="10,317,10,10" MinWidth="764"/>
 
                 </Grid>
             </TabItem>
         </TabControl>
-        <Grid Background="White" Opacity="0.75" x:Name="LoadingGrid" Margin="10,10,-10,-10">
+        <Grid Background="White" Opacity="0.75" x:Name="LoadingGrid">
             <TextBlock Text="... LOADING ..." HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" FontSize="16"/>
         </Grid>
     </Grid>
