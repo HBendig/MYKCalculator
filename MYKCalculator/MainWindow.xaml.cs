@@ -616,7 +616,7 @@ namespace MYCCalculator
             for (int currentColumnIndex = 4; currentColumnIndex < loadedDataSet_mutationsTemplate.Tables[selectedTableIndex_mutationsTemplate].Columns.Count; currentColumnIndex++)
             {
                 string currentGen = currentRow_headline[currentColumnIndex].ToString();
-                if (currentGen != "")
+                if (currentGen != "" && !genList.ContainsKey(currentGen))
                 {
                     genList.Add(currentGen, 0);
                 }
@@ -644,23 +644,28 @@ namespace MYCCalculator
             {
                 int symbolIndex = FindIndexToColumn("symbol", dt.Rows[0].ItemArray);
                 int patientIdIndex = FindIndexToColumn("array_id", dt.Rows[0].ItemArray);
-
-                for (int currentRowIndex = 1; currentRowIndex < dt.Rows.Count; currentRowIndex++)
+                if(!symbolIndex.Equals(-1) && !patientIdIndex.Equals(-1))
                 {
-                    DataRow currentRow = dt.Rows[currentRowIndex];
-
-                    string patientID = currentRow[patientIdIndex].ToString();
-                    string symbol = currentRow[symbolIndex].ToString();
-
-                    foreach (Patient p in patientList)
+                    for (int currentRowIndex = 1; currentRowIndex < dt.Rows.Count; currentRowIndex++)
                     {
-                        if (p.ArrayID == patientID)
+                        DataRow currentRow = dt.Rows[currentRowIndex];
+
+                        string patientID = currentRow[patientIdIndex].ToString();
+                        if (patientID != "-1")
                         {
-                            if (p.GenListe.ContainsKey(symbol))
+                            string symbol = currentRow[symbolIndex]?.ToString();
+
+                            foreach (Patient p in patientList)
                             {
-                                p.GenListe[symbol]++;
+                                if (p.ArrayID == patientID)
+                                {
+                                    if (p.GenListe.ContainsKey(symbol))
+                                    {
+                                        p.GenListe[symbol]++;
+                                    }
+                                    break;
+                                }
                             }
-                            break;
                         }
                     }
                 }
